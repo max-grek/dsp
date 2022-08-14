@@ -1,8 +1,8 @@
 # build args
-SERVICE_NAME		?=	sync-service
+SERVICE_NAME		?=	dsp-service
 VERSION			?=	latest
-#REGISTRY
-IMG			?=	$(REGISTRY)/$(SERVICE_NAME):$(VERSION)
+REGISTRY		?=	test
+IMG			?=	$(REGISTRY)/$(SERVICE_NAME)
 
 # helpful things
 CID 			?= 	$(shell docker ps --no-trunc -aqf name=$(SERVICE_NAME))
@@ -13,7 +13,7 @@ DEFAULT_HOST		?= 0.0.0.0
 
 # http args
 HTTP_HOST		?= $(DEFAULT_HOST)
-HTTP_PORT 		?= 9001
+HTTP_PORT 		?= 9000
 HTTP_TIMEOUT		?= 10s
 
 # db args
@@ -64,19 +64,16 @@ local: test local-build local-start
 local-build:
 	@clear
 	@echo "Building an image"
-	@docker build -t $(IMG) --build-arg REGISTRY=$(REGISTRY) .
+	@docker build --no-cache -t $(IMG) --build-arg REGISTRY=$(REGISTRY) .
 
 local-start:
 	@clear
 	@echo "Running container"
-	@docker run --rm --name $(SERVICE_NAME) --network amc
-		--ip 192.168.123.3 -p 9000:9000/tcp \ 
-		-e SEC_SECRET=$(SEC_SECRET) $(IMG) -host $(HTTP_HOST) \
-		-port $(HTTP_PORT) -timeout $(HTTP_TIMEOUT) \
-		-db-driver $(DRIVER) -db-host $(D_DB_HOST) \
-		-db-port $(D_DB_PORT)  -db-user $(DB_USER) \
-		-db-password $(DB_PASSWORD) -is-encrypted -db-name $(DB_NAME) \
-		-db-schema $(DB_SCHEMA) -db-mode $(DB_MODE) \
+	@docker run --rm --name $(SERVICE_NAME) --network test --ip 193.168.0.3 -p 9000:9000/tcp \
+		 -e SEC_SECRET=$(SEC_SECRET) $(IMG) \
+		-host $(HTTP_HOST) -port $(HTTP_PORT) -timeout $(HTTP_TIMEOUT) \
+		-db-driver $(DRIVER) -db-host $(D_DB_HOST) -db-port $(D_DB_PORT) -db-user $(DB_USER) \
+		-db-password $(DB_PASSWORD) -is-encrypted -db-name $(DB_NAME) -db-schema $(DB_SCHEMA) -db-mode $(DB_MODE) \
 
 # run all containers at once
 # if don't specify any directory for a volume: 

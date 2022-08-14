@@ -1,0 +1,5 @@
+# ignore emacs staff
+**/*.*~
+
+# ignore mac staff
+**/.DS_Store
