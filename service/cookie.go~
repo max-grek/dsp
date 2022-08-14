@@ -1,0 +1,34 @@
+package service
+
+import (
+	"context"
+	"net/http"
+	"test-assignment-cookie-sync/connector"
+
+	satoriuuid "github.com/satori/go.uuid"
+)
+
+const SYNC = "sync"
+
+type Sync struct {
+	name string
+	conn connector.DB
+}
+
+func New(name string, conn connector.DB) *Sync {
+	switch name {
+	case SYNC:
+		return &Sync{name: SYNC, conn: conn}
+	default:
+		return nil
+	}
+}
+
+func (s *Sync) ProcessCookie(ctx context.Context) (*http.Cookie, error) {
+	cid := satoriuuid.NewV4().String()
+	return &http.Cookie{
+		Name:   "dsp",
+		Value:  cid,
+		MaxAge: 0,
+	}, s.conn.Cookie().PersistCookie(ctx, satoriuuid.NewV4().String(), cid)
+}
