@@ -2,7 +2,7 @@
 SERVICE_NAME		?=	dsp-service
 VERSION			?=	latest
 REGISTRY		?=	test
-IMG			?=	$(REGISTRY)/$(SERVICE_NAME)
+IMG			?=	$(REGISTRY)/$(SERVICE_NAME):$(VERSION)
 
 # helpful things
 CID 			?= 	$(shell docker ps --no-trunc -aqf name=$(SERVICE_NAME))
@@ -28,7 +28,7 @@ DB_MODE 		?= disable
 DSN			?= $(DB_SCHEMA)://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_MODE)
 
 # docker args
-D_DB_HOST 		?= 192.168.123.1
+D_DB_HOST 		?= 194.168.0.4
 D_DB_PORT 		?= 5432
 
 # secrets
@@ -64,12 +64,12 @@ local: test local-build local-start
 local-build:
 	@clear
 	@echo "Building an image"
-	@docker build --no-cache -t $(IMG) --build-arg REGISTRY=$(REGISTRY) .
+	@docker build -t $(IMG) --build-arg REGISTRY=$(REGISTRY) .
 
 local-start:
 	@clear
 	@echo "Running container"
-	@docker run --rm --name $(SERVICE_NAME) --network test --ip 193.168.0.3 -p 9000:9000/tcp \
+	@docker run --rm --name $(SERVICE_NAME) --network test2 --ip 194.168.0.2 -p 9000:9000/tcp \
 		 -e SEC_SECRET=$(SEC_SECRET) $(IMG) \
 		-host $(HTTP_HOST) -port $(HTTP_PORT) -timeout $(HTTP_TIMEOUT) \
 		-db-driver $(DRIVER) -db-host $(D_DB_HOST) -db-port $(D_DB_PORT) -db-user $(DB_USER) \

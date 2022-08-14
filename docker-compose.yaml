@@ -1,0 +1,41 @@
+version: '3.5'
+services:
+  vault:
+    image: test-vault
+    container_name: test-vault
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_USER=postgres
+    networks:
+      test-net:
+        ipv4_address: 194.168.0.4
+
+  shop:
+    image: test-shop
+    container_name: test-shop
+    ports:
+      - "9002:9000"
+    networks:
+      test-net:
+        ipv4_address: 194.168.0.5
+
+  next-website:
+    image: test-next
+    container_name: test-website
+    ports:
+      - "9003:9000"
+    networks:
+      test-net:
+        ipv4_address: 194.168.0.6
+
+networks:
+  test-net:
+    ipam:
+      driver: default
+      config:
+      -  subnet: 194.168.0.0/16
+    name: test2
+volumes:
+  db-data: # named volumes can be managed easier using docker-compose
